@@ -1,0 +1,144 @@
+﻿@rendermode @(new InteractiveServerRenderMode(prerender: false))
+@page "/user/create/item"
+@attribute [Authorize]
+@attribute [StreamRendering]
+@inject CatalogService CatalogService
+@inject NavigationManager Navigation
+
+<PageTitle>Create item | Northern Mountains</PageTitle>
+<SectionContent SectionName="page-header-title">Create item</SectionContent>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+
+<div class="orders">
+        <div class="w-60">
+            <h3>Alta de artículo</h3>
+            <div class="d-flex flex-direction-row mb-2 column-gap-1 row-gap-2 flex-wrap">
+                <div class="d-flex flex-direction-row mb-3 column-gap-1 row-gap-2 flex-wrap">
+                    <label style="width:140px;" for="id">Id: </label>
+                    <input style="width:100px;" type="number" id="id" name="id" class="form-control" @bind="Id" />
+                </div>
+                <div class="d-flex flex-direction-row mb-3 column-gap-1 row-gap-2 flex-wrap">
+                    <label style="width:140px;" for="name">Name: </label>
+                    <input style="width:500px;" type="text" id="name" name="name" class="form-control" @bind="Name" />
+                </div>
+                <div class="d-flex flex-direction-row mb-3 column-gap-1 row-gap-2 flex-wrap">
+                    <label style="width:140px;" for="description">Description:</label>
+                    <input style="width:500px;" type="text" id="description" name="description" class="form-control" @bind="Description" />
+                </div>
+              @*   <div class="d-flex flex-direction-row mb-3 column-gap-1 row-gap-2 flex-wrap">
+                    <label style="width:140px;" for="PictureFileName">Picture FileName:</label>
+                    <input style="width:500px;" type="text" id="PictureFileName" name="PictureFileName" class="form-control" @bind="PictureFileName" />
+                </div> *@
+                <div class="d-flex flex-direction-row mb-3 column-gap-1 row-gap-2 flex-wrap">
+                    <label style="width:140px;" for="type">Type:</label>
+                    <select style="width:500px;" id="type" class="form-control" @bind="CatalogTypeId">
+                        <option value="">Select type</option>
+                        @if (catalogItemTypes != null)
+                        {
+                            @foreach (var itemType in catalogItemTypes)
+                            {
+                                <option value="@itemType.Id">@itemType.Type</option>
+                            }
+                        }
+                    </select>
+                </div>
+                <div class="d-flex flex-direction-row mb-3 column-gap-1 row-gap-2 flex-wrap">
+                    <label style="width:140px;" for="brand">Brand:</label>
+                    <select style="width:500px;" id="brand" class="form-control" @bind="CatalogBrandId">
+                        <option value="">Select brand</option>
+                        @if (catalogBrands != null)
+                        {
+                            @foreach (var brand in catalogBrands)
+                            {
+                                <option value="@brand.Id">@brand.Brand</option>
+                            }
+                        }
+                    </select>
+                </div>
+                <div class="d-flex flex-direction-row mb-3 column-gap-1 row-gap-2 flex-wrap">
+                    <label style="width:140px;" for="Price">Price:</label>
+                    <input style="width:100px;" type="number" id="Price" name="Price" class="form-control" @bind="Price" />
+                </div>
+                <div class="d-flex flex-direction-row mb-3 column-gap-1 row-gap-2 flex-wrap">
+                    <label style="width:140px;" for="AvailableStock">Available Stock:</label>
+                    <input style="width:100px;" type="number" id="AvailableStock" name="AvailableStock" class="form-control" @bind="AvailableStock" />
+                </div>
+                <div class="d-flex flex-direction-row mb-3 column-gap-1 row-gap-2 flex-wrap">
+                    <label style="width:140px;" for="RestockThreshold">Restock:</label>
+                    <input style="width:100px;" type="number" id="RestockThreshold" name="RestockThreshold" class="form-control" @bind="RestockThreshold" />
+                </div>
+                <div class="d-flex flex-direction-row mb-3 column-gap-1 row-gap-2 flex-wrap">
+                    <label style="width:140px;" for="MaxStockThreshold">MaxStock:</label>
+                    <input style="width:100px;" type="number" id="MaxStockThreshold" name="MaxStockThreshold" class="form-control" @bind="MaxStockThreshold" />
+                </div>
+            </div>
+        </div>
+    <button type="submit" title="Create item" @onclick="HandleSubmit">Create item</button>
+
+</div>
+
+
+@code {
+    IEnumerable<CatalogBrand>? catalogBrands;
+    IEnumerable<CatalogItemType>? catalogItemTypes;
+    int Id { get; set; }
+    int CatalogBrandId { get; set; } = 9;
+    int CatalogTypeId { get; set; } = 4;
+    public required string Name { get; set; }
+
+    public required string Description { get; set; }
+
+    public decimal Price { get; set; } = 59;
+
+    public required string PictureFileName { get; set; }
+
+    public required string PictureUri { get; set; }
+    int AvailableStock { get; set; } = 10;
+    int RestockThreshold { get; set; }= 5;
+    int MaxStockThreshold { get; set; }= 20;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var brandsTask = CatalogService.GetBrands();
+        var itemTypesTask = CatalogService.GetTypes();
+        await Task.WhenAll(brandsTask, itemTypesTask);
+        catalogBrands = brandsTask.Result;
+        catalogItemTypes = itemTypesTask.Result;
+    }
+
+    private async Task HandleSubmit()
+    {
+        try
+        {
+
+
+            var item = new CatalogItemDTO
+                {
+                    Id = Id,
+                    Name = Name,
+                    Description = Description,
+                    Price = Price,
+                    PictureFileName =  $"{Id}.webp",
+                    PictureUri = PictureUri,
+                    CatalogBrandId = CatalogBrandId,
+                    CatalogTypeId = CatalogTypeId,
+                    AvailableStock = AvailableStock,
+                    RestockThreshold = RestockThreshold,
+                    MaxStockThreshold = MaxStockThreshold
+                };
+
+            await CatalogService.CreateCatalogItem(item);
+
+            // Redireccionar a la página de inicio (home)
+            Navigation.NavigateTo("/");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+            Navigation.NavigateTo("/");
+
+        }
+        
+       
+    }
+} 

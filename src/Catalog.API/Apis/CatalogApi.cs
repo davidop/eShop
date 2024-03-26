@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http.HttpResults;
+﻿using Catalog.API.Helpers;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Pgvector.EntityFrameworkCore;
 
 namespace eShop.Catalog.API;
@@ -271,6 +272,15 @@ public static class CatalogApi
             RestockThreshold = product.RestockThreshold,
             MaxStockThreshold = product.MaxStockThreshold
         };
+
+        var dalleImage = await services.CatalogAI.CreateDallEImageAsync(item.Description);
+
+        if (!string.IsNullOrEmpty(dalleImage))
+        {
+            await Utils.DownloadAndSavePhoto(dalleImage, item.PictureFileName);
+        }
+
+
         item.Embedding = await services.CatalogAI.GetEmbeddingAsync(item);
 
         services.Context.CatalogItems.Add(item);

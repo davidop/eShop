@@ -57,7 +57,6 @@ public class CatalogService(HttpClient httpClient)
         {
             var brandQs = brand.HasValue ? brand.Value.ToString() : string.Empty;
             filterQs = $"/type/{type.Value}/brand/{brandQs}";
-
         }
         else if (brand.HasValue)
         {
@@ -70,5 +69,12 @@ public class CatalogService(HttpClient httpClient)
         }
 
         return $"{baseUri}items{filterQs}?pageIndex={pageIndex}&pageSize={pageSize}";
+    }
+
+    public async Task<CatalogItemDTO?> CreateCatalogItem(CatalogItemDTO catalogItem)
+    {
+        var uri = $"{remoteServiceBaseUrl}items";
+        var response = await httpClient.PostAsJsonAsync(uri, catalogItem);
+        return await response.Content.ReadFromJsonAsync<CatalogItemDTO>();
     }
 }

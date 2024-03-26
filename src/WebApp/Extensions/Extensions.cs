@@ -98,11 +98,17 @@ public static class Extensions
     {
         var openAIOptions = builder.Configuration.GetSection("AI").Get<AIOptions>()?.OpenAI;
         var deploymentName = openAIOptions?.ChatModel;
+        var endpoint = openAIOptions?.EndPoint;
+        var key = openAIOptions?.Key;
 
-        if (!string.IsNullOrWhiteSpace(builder.Configuration.GetConnectionString("openai")) && !string.IsNullOrWhiteSpace(deploymentName))
+        if (!string.IsNullOrWhiteSpace(builder.Configuration.GetConnectionString("openai")) 
+            && !string.IsNullOrWhiteSpace(deploymentName) 
+            && !string.IsNullOrWhiteSpace(endpoint) && !string.IsNullOrWhiteSpace(key))
         {
             builder.AddAzureOpenAI("openai");
             builder.Services.AddAzureOpenAIChatCompletion(deploymentName);
+            var kernelBuilder =  builder.Services.AddKernel();
+            kernelBuilder.AddAzureOpenAIChatCompletion(deploymentName, endpoint, key);
         }
     }
 

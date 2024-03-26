@@ -21,6 +21,7 @@
   <!-- AI -->
   <ItemGroup>
     <PackageReference Include="Aspire.Azure.AI.OpenAI" />
+    <PackageReference Include="Newtonsoft.Json" />
     <PackageReference Include="Pgvector" />
     <PackageReference Include="Pgvector.EntityFrameworkCore" />
   </ItemGroup>

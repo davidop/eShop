@@ -242,6 +242,10 @@ body {
     margin: auto;
 }
 
+.w-60 {
+    width: 60%;
+}
+
 .button {
     display: flex;
     padding: 1rem 0.75rem;
