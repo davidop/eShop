@@ -66,3 +66,6 @@ public sealed class OrderingApiFixture : WebApplicationFactory<Program>, IAsyncL
                 builder.UseMiddleware<AutoAuthorizeMiddleware>();
                 next(builder);
             };
+        }
+    }
+}

@@ -46,4 +46,10 @@ public sealed class CatalogApiFixture : WebApplicationFactory<Program>, IAsyncLi
         {
             _app.Dispose();
         }
-    
+    }
+
+    public async Task InitializeAsync()
+    {
+        await _app.StartAsync();
+    }
+}
